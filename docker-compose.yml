@@ -1,0 +1,14 @@
+services:
+  frontend:
+      build: 
+        context: . 
+      container_name: vanilla-frontend
+      ports:
+        - "3000:80" 
+      networks:
+        - app-network
+
+networks:
+  app-network:
+    external: true
+    name: shared-network

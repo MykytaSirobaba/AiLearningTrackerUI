@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Головна</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+    />
+    <style>
+      .nav-pills .nav-link.active {
+        background-color: #0d6efd;
+      }
+      .nav-pills .nav-link {
+        color: #495057;
+      }
+      .card-custom {
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 shadow-sm">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="dashboard.html"
+          ><i class="bi bi-rocket-takeoff"></i> Goal Tracker</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav align-items-center">
+            <li class="nav-item me-3 text-white">
+              <i class="bi bi-person-circle"></i> Привіт,
+              <span id="usernameDisplay">User</span>
+            </li>
+            <li class="nav-item">
+              <button id="logoutBtn" class="btn btn-outline-light btn-sm">
+                Вийти
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <ul
+        class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded shadow-sm"
+        id="mainTab"
+        role="tablist"
+      >
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active fw-bold"
+            id="goals-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#goals"
+            type="button"
+            role="tab"
+          >
+            <i class="bi bi-list-task"></i> Мої Цілі
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link fw-bold"
+            id="logs-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#logs"
+            type="button"
+            role="tab"
+          >
+            <i class="bi bi-journal-text"></i> Прогрес
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link fw-bold"
+            id="ai-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#ai"
+            type="button"
+            role="tab"
+          >
+            <i class="bi bi-cpu"></i> AI Аналіз
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link fw-bold"
+            id="settings-tab"
+            data-bs-toggle="pill"
+            data-bs-target="#settings"
+            type="button"
+            role="tab"
+          >
+            <i class="bi bi-shield-lock"></i> Безпека (2FA)
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content" id="mainTabContent">
+        <div class="tab-pane fade show active" id="goals" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4>Активні цілі</h4>
+            <button
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#createGoalModal"
+            >
+              <i class="bi bi-plus-lg"></i> Створити ціль
+            </button>
+          </div>
+
+          <div class="row" id="goalsContainer"></div>
+
+          <hr class="my-4" />
+
+          <h4>Завершені цілі</h4>
+          <div class="list-group" id="completedGoalsContainer"></div>
+        </div>
+
+        <div class="tab-pane fade" id="logs" role="tabpanel">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-4 mb-4">
+                <div class="card card-custom p-4 h-100">
+                  <h5 class="mb-3 text-primary">
+                    <i class="bi bi-bullseye"></i> Виберіть ціль
+                  </h5>
+
+                  <div class="mb-4">
+                    <label class="form-label small text-muted"
+                      >Оберіть ціль для трекінгу:</label
+                    >
+                    <select id="progressGoalSelector" class="form-select mb-3">
+                      <option value="" selected disabled>
+                        Завантаження цілей...
+                      </option>
+                    </select>
+                  </div>
+
+                  <hr />
+
+                  <h5 class="mb-3">
+                    <i class="bi bi-plus-circle"></i> Залогінити час
+                  </h5>
+                  <form id="createLogForm">
+                    <div class="mb-3">
+                      <label class="form-label">Короткий заголовок</label>
+                      <input
+                        type="text"
+                        id="logTitle"
+                        class="form-control"
+                        placeholder="Напр: Вивчив анотації"
+                        required
+                        maxlength="100"
+                      />
+                    </div>
+
+                    <div class="row mb-3">
+                      <div class="col-6">
+                        <label class="form-label">Години</label>
+                        <input
+                          type="number"
+                          id="logHours"
+                          class="form-control"
+                          placeholder="0"
+                          min="0"
+                          max="100"
+                          value="0"
+                        />
+                      </div>
+                      <div class="col-6">
+                        <label class="form-label">Хвилини</label>
+                        <input
+                          type="number"
+                          id="logMinutes"
+                          class="form-control"
+                          placeholder="30"
+                          min="0"
+                          max="59"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Нотатки (Optional)</label>
+                      <textarea
+                        id="logNote"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Деталі про те, що вивчили..."
+                        maxlength="1000"
+                      ></textarea>
+                      <div class="form-text">
+                        Від 20 до 1000 символів (якщо заповнюєте)
+                      </div>
+                    </div>
+
+                    <div class="d-grid">
+                      <button
+                        type="submit"
+                        id="addLogBtn"
+                        class="btn btn-success"
+                        disabled
+                      >
+                        <i class="bi bi-save"></i> Зберегти прогрес
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="card card-custom p-4 h-100">
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-3"
+                  >
+                    <h5 class="mb-0">Історія активності</h5>
+                    <button
+                      class="btn btn-sm btn-outline-secondary"
+                      onclick="refreshLogs()"
+                    >
+                      <i class="bi bi-arrow-clockwise"></i> Оновити
+                    </button>
+                  </div>
+
+                  <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                      <thead class="table-light">
+                        <tr>
+                          <th scope="col">Дата</th>
+                          <th scope="col">Заголовок</th>
+                          <th scope="col">Час</th>
+                          <th scope="col" class="text-end">Дії</th>
+                        </tr>
+                      </thead>
+                      <tbody id="logsTableBody">
+                        <tr>
+                          <td colspan="4" class="text-center text-muted py-4">
+                            Оберіть ціль зліва, щоб побачити прогрес.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <nav
+                    aria-label="Logs navigation"
+                    id="logsPagination"
+                    class="d-none mt-3"
+                  >
+                    <ul class="pagination justify-content-center mb-0"></ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="ai" role="tabpanel">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-4 mb-4">
+                <div
+                  class="card card-custom p-4 h-100 border-primary border-opacity-25"
+                >
+                  <h5 class="mb-3 text-primary">
+                    <i class="bi bi-robot"></i> AI Аналітик
+                  </h5>
+
+                  <div class="mb-4">
+                    <label class="form-label small text-muted"
+                      >Оберіть ціль для аналізу:</label
+                    >
+                    <select id="aiGoalSelector" class="form-select mb-3">
+                      <option value="" selected disabled>
+                        Завантаження цілей...
+                      </option>
+                    </select>
+                  </div>
+
+                  <div
+                    id="aiConfigPanel"
+                    class="opacity-50"
+                    style="pointer-events: none"
+                  >
+                    <hr />
+                    <h6 class="mb-3">Параметри аналізу</h6>
+                    <form id="createAiAnalysisForm">
+                      <div class="mb-3">
+                        <label class="form-label"
+                          >Глибина аналізу (кількість логів)</label
+                        >
+                        <input
+                          type="number"
+                          id="aiLimit"
+                          class="form-control"
+                          value="10"
+                          min="1"
+                          max="50"
+                          required
+                        />
+                        <div class="form-text">
+                          Скільки останніх записів прогресу врахувати (1-50).
+                        </div>
+                      </div>
+
+                      <div class="d-grid">
+                        <button
+                          type="submit"
+                          id="generateAiBtn"
+                          class="btn btn-primary"
+                        >
+                          <span id="aiBtnText"
+                            ><i class="bi bi-stars"></i> Генерувати аналіз</span
+                          >
+                          <span
+                            id="aiBtnSpinner"
+                            class="spinner-border spinner-border-sm d-none"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        </button>
+                      </div>
+                    </form>
+                    <div class="alert alert-light mt-3 small text-muted">
+                      <i class="bi bi-info-circle"></i> AI проаналізує ваші
+                      записи, час та нотатки, щоб надати рекомендації.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-8">
+                <div class="card card-custom p-4 h-100">
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-3"
+                  >
+                    <h5 class="mb-0">Історія рекомендацій</h5>
+                    <button
+                      class="btn btn-sm btn-outline-secondary"
+                      onclick="refreshAiList()"
+                    >
+                      <i class="bi bi-arrow-clockwise"></i> Оновити
+                    </button>
+                  </div>
+
+                  <div class="list-group list-group-flush" id="aiListContainer">
+                    <div class="text-center text-muted py-5">
+                      <i class="bi bi-arrow-left-circle"></i> Оберіть ціль
+                      зліва, щоб побачити історію аналізів.
+                    </div>
+                  </div>
+
+                  <nav
+                    aria-label="AI navigation"
+                    id="aiPagination"
+                    class="d-none mt-3"
+                  >
+                    <ul class="pagination justify-content-center mb-0"></ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="settings" role="tabpanel">
+          <div class="card card-custom p-4">
+            <h4 class="mb-4">Двофакторна аутентифікація (2FA)</h4>
+
+            <div class="accordion" id="accordion2FA">
+              <div class="accordion-item" id="accordionItemSetup">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseSetup"
+                  >
+                    1. Налаштування (Setup)
+                  </button>
+                </h2>
+                <div
+                  id="collapseSetup"
+                  class="accordion-collapse collapse show"
+                  data-bs-parent="#accordion2FA"
+                >
+                  <div class="accordion-body text-center">
+                    <p>Натисніть кнопку нижче, щоб отримати QR-код.</p>
+
+                    <button id="setup2faBtn" class="btn btn-primary mb-3">
+                      Отримати QR-код
+                    </button>
+
+                    <div
+                      id="qrCodeContainer"
+                      class="d-flex justify-content-center my-3"
+                    ></div>
+
+                    <p class="mt-2 small text-muted">
+                      Відскануйте цей код у Google Authenticator.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item" id="accordionItemActivate">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseActivate"
+                  >
+                    2. Активація (Activate)
+                  </button>
+                </h2>
+                <div
+                  id="collapseActivate"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#accordion2FA"
+                >
+                  <div class="accordion-body">
+                    <form>
+                      <label class="form-label">Введіть код з додатку</label>
+                      <div class="input-group mb-3">
+                        <input
+                          id="verify2faInput"
+                          type="text"
+                          class="form-control"
+                          placeholder="123456"
+                        />
+                        <button
+                          id="activate2faBtn"
+                          class="btn btn-success"
+                          type="button"
+                        >
+                          Активувати
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item" id="accordionItemDisable">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed text-danger"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseDisable"
+                  >
+                    Вимкнення (Disable)
+                  </button>
+                </h2>
+                <div
+                  id="collapseDisable"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#accordion2FA"
+                >
+                  <div class="accordion-body">
+                    <p class="text-danger">
+                      Ви впевнені? Це знизить рівень безпеки вашого акаунту.
+                    </p>
+                    <form>
+                      <label class="form-label"
+                        >Підтвердіть кодом для вимкнення</label
+                      >
+                      <div class="input-group">
+                        <input
+                          id="disable2faInput"
+                          type="text"
+                          class="form-control"
+                          placeholder="Код з додатку"
+                        />
+                        <button
+                          id="disable2faBtn"
+                          class="btn btn-danger"
+                          type="button"
+                        >
+                          Вимкнути 2FA
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="createGoalModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Нова ціль (AI Generation)</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="createGoalForm">
+              <div class="mb-3">
+                <label class="form-label">Назва цілі (min 10 символів)</label>
+                <input
+                  type="text"
+                  id="goalTitle"
+                  class="form-control"
+                  placeholder="Наприклад: Вивчити Spring Security"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">AI Промпт (опис для генерації)</label>
+                <textarea
+                  id="goalPrompt"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Я хочу вивчити основи, JWT токени та OAuth2..."
+                  required
+                ></textarea>
+                <div class="form-text">
+                  Опишіть детально, що ви хочете вивчити (10-200 символів).
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Дедлайн</label>
+                  <input
+                    type="date"
+                    id="goalDeadline"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Годин на тиждень</label>
+                  <input
+                    type="number"
+                    id="goalHours"
+                    class="form-control"
+                    placeholder="Напр. 5"
+                    min="1"
+                    max="100"
+                    required
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Скасувати
+            </button>
+            <button type="button" id="createGoalBtn" class="btn btn-primary">
+              <span id="btnText">Створити</span>
+              <span
+                id="btnSpinner"
+                class="spinner-border spinner-border-sm d-none"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="goalDetailsModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="detailGoalTitle">Завантаження...</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-4">
+              <h6>Опис:</h6>
+              <p id="detailGoalDescription" class="text-muted">...</p>
+              <div class="d-flex gap-3">
+                <span
+                  class="badge bg-info text-dark"
+                  id="detailDifficulty"
+                ></span>
+                <span class="badge bg-secondary" id="detailDeadline"></span>
+              </div>
+            </div>
+
+            <hr />
+
+            <h5 class="mb-3">План навчання (Subgoals)</h5>
+            <div id="subgoalsList" class="list-group"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Закрити
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="logDetailsModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-light">
+            <h5 class="modal-title">Деталі прогресу</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h4 id="modalLogTitle" class="mb-3">Title</h4>
+
+            <div class="d-flex justify-content-between mb-3 text-muted">
+              <span id="modalLogDate"
+                ><i class="bi bi-calendar3"></i> Date</span
+              >
+              <span id="modalLogTime" class="fw-bold text-success"
+                ><i class="bi bi-clock-history"></i> Time</span
+              >
+            </div>
+
+            <hr />
+            <h6>Нотатка:</h6>
+            <p id="modalLogNote" class="text-break bg-light p-3 rounded"></p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Закрити
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="aiDetailsModal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-magic"></i> Результат аналізу
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h4 id="aiModalTitle" class="mb-2">...</h4>
+            <p class="text-muted small mb-4">
+              Створено: <span id="aiModalDate"></span>
+            </p>
+
+            <div class="p-3 bg-light rounded border">
+              <div
+                id="aiModalText"
+                style="
+                  white-space: pre-wrap;
+                  font-family: sans-serif;
+                  line-height: 1.6;
+                "
+              ></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Закрити
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script src="js/api.js"></script>
+
+    <script src="js/goals.js"></script>
+    <script src="js/logs.js"></script>
+    <script src="js/ai.js"></script>
+
+    <script src="js/dashboard.js"></script>
+  </body>
+</html>
